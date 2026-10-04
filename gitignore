@@ -1,0 +1,18 @@
+# Dependencies
+node_modules/
+
+# Agent & Temp directories
+.agent/
+.gemini/
+*.log
+
+# System files
+.DS_Store
+Thumbs.db
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
