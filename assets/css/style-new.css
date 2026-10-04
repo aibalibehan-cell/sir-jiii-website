@@ -117,7 +117,12 @@ main.touch .main-wrap {
    transform: translate(-50%, -50%);
    opacity: 0;
    pointer-events: none;
-   display: block;
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   width: 90vw;
+   max-width: 90vw;
+   text-align: center;
    will-change: opacity;
 }
 
@@ -126,19 +131,21 @@ main.touch .main-wrap {
    padding: 0;
    color: var(--color-white);
    position: absolute;
-   top:0;
+   top: 50%;
    left: 50%;
-   transform: translateX(-50%);
+   transform: translate(-50%, -50%);
    display: none;
    padding-left: .6em;
    white-space: nowrap;
    padding-right: .4em;
+   font-size: clamp(1.6rem, 5vw, 3.8rem);
+   max-width: 90vw;
    will-change: opacity;
 }
 
 .loading-container .loading-words h2.jap {
-   font-size: calc(clamp(3.25em, 5vw, 4.5em) * .65);
-   transform: translate(-50%, 10%);
+   font-size: calc(clamp(1.6rem, 5vw, 3.8rem) * .65);
+   transform: translate(-50%, -40%);
 }
 
 .loading-container .dot {
@@ -182,17 +189,18 @@ main.touch .main-wrap {
 }
 
 @media screen and (max-width: 540px) {
-
-   /* .loading-container .loading-words h2 {
-      padding-left: 0;
-   } */
-
-   /* .loading-container .dot {
-      display: none;
-   } */
+   .loading-container .loading-words h2 {
+      font-size: clamp(1.25rem, 5.8vw, 1.85rem) !important;
+      padding-left: 0.35em;
+      padding-right: 0.35em;
+      white-space: normal !important;
+      word-break: keep-all;
+      text-align: center;
+      width: 100%;
+   }
 
    .loading-container .dot {
-      top: 42%;
+      top: 45%;
    }
 }
 
@@ -2131,9 +2139,9 @@ main.touch .main-wrap {
 }
 
 .single-about-image .overlay:nth-child(1) {
-   background: url("../img/about-nitish-portrait.jpg") center 82% / cover no-repeat;
-   top: -12%;
-   height: 125%;
+   background: url("../img/about-nitish-portrait.jpg") center 22% / cover no-repeat;
+   top: -10%;
+   height: 120%;
    width: 100%;
    will-change: transform;
 }
@@ -2208,9 +2216,9 @@ main.touch .main-wrap {
    .single-about-image .overlay:nth-child(1) {
       width: 100%;
       left: 0;
-      top: -12%;
-      height: 125%;
-      background: url("../img/about-nitish-portrait.jpg") center 82% / cover no-repeat;
+      top: -10%;
+      height: 120%;
+      background: url("../img/about-nitish-portrait.jpg") center 22% / cover no-repeat;
       will-change: transform;
    }
 
@@ -3137,16 +3145,32 @@ main.touch .case-intro-image .btn-wrap {
    padding-top: calc(var(--section-padding) / 1.9);
 }
 
+.footer-case-wrap .next-case-btn {
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   position: relative;
+   overflow: visible;
+}
+
+.footer-case-wrap .next-case-btn .flex-col {
+   order: 1 !important;
+   text-align: center;
+   position: relative;
+   z-index: 3;
+}
+
 .footer-case-wrap .next-case-btn:hover {
    text-decoration: none;
 }
 
 .footer-case-wrap .next-case-btn:hover h2 {
-   opacity: .25;
+   opacity: .4;
 }
 
 .footer-case-wrap .tile-image-wrap {
-   width: calc(clamp(10em, 27.5vw, 25em) * .9);
+   order: 2 !important;
+   width: calc(clamp(11em, 27.5vw, 25em) * .9);
    position: absolute;
    left: 50%;
    bottom: 0;
@@ -3154,6 +3178,7 @@ main.touch .case-intro-image .btn-wrap {
    transform: translateX(-50%);
    overflow: hidden;
    z-index: 2;
+   border-radius: 12px;
 }
 
 .footer-case-wrap .tile-image-wrap::before {
@@ -3167,8 +3192,9 @@ main.touch .case-intro-image .btn-wrap {
    position: absolute;
    top: 0;
    left: 0;
-   transform: translateY(30%);
-   transition: var(--animation-primary);
+   transform: translateY(45%);
+   transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+   will-change: transform;
 }
 
 .footer-case-wrap .next-case-btn:hover .tile-image-wrap .tile-image {
@@ -3188,14 +3214,14 @@ main.touch .case-intro-image .btn-wrap {
    }
 
    .footer-case-wrap .tile-image-wrap .tile-image {
-      transform: translateY(20%);
+      transform: translateY(35%);
    }
 }
 
 @media screen and (max-width: 720px){
 
    .footer-case-wrap .footer {
-      padding-top: 1.5rem !important;
+      padding-top: 2rem !important;
    }
 
    .footer-case-wrap .container.medium .row:nth-child(1) {
@@ -3211,29 +3237,42 @@ main.touch .case-intro-image .btn-wrap {
       margin-bottom: 0.85rem;
    }
 
+   .footer-case-wrap .next-case-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+   }
+
+   .footer-case-wrap .next-case-btn .flex-col {
+      order: 1 !important;
+      margin-bottom: 1rem;
+   }
+
    .footer-case-wrap .tile-image-wrap {
+      order: 2 !important;
       position: relative !important;
       left: auto !important;
       bottom: auto !important;
       transform: none !important;
-      width: clamp(16rem, 80vw, 25rem) !important;
-      margin: 0.75rem auto 1.5rem auto !important;
-      border-radius: 12px;
+      width: clamp(16rem, 82vw, 24rem) !important;
+      margin: 0.5rem auto 1.5rem auto !important;
+      border-radius: 14px;
       overflow: hidden;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+      box-shadow: 0 12px 35px rgba(0,0,0,0.45);
    }
 
    .footer-case-wrap .tile-image-wrap::before {
-      padding-bottom: 58% !important;
+      padding-bottom: 56.25% !important;
    }
 
    .footer-case-wrap .tile-image-wrap .tile-image {
-      transform: none !important;
+      transform: translateY(60%);
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
+      will-change: transform;
    }
 
    .footer-case-wrap .next-case-btn:hover h2 {
@@ -3251,7 +3290,7 @@ main.touch .case-intro-image .btn-wrap {
    }
 
    .footer-case-wrap .tile-image-wrap::before {
-      padding-bottom: 58% !important;
+      padding-bottom: 56.25% !important;
    }
 }
 
@@ -4250,10 +4289,11 @@ main.touch .case-intro-image .btn-wrap {
    -webkit-backface-visibility: hidden;
 }
 
-
-
-
-
+@media screen and (max-width: 1024px) {
+   [data-scroll-section] {
+      will-change: auto !important;
+   }
+}
 
 /* ------------------------- PatnaHost Kinetic Word Strewing Section ------------------------- */
 .horizontal-words {
@@ -4261,23 +4301,25 @@ main.touch .case-intro-image .btn-wrap {
    height: 220vh;
    background-color: var(--color-light, #f4f4f4);
    color: var(--color-dark, #111111);
-   overflow: clip;
+   overflow: visible;
 }
 
 .horizontal-words__content {
+   position: -webkit-sticky;
    position: sticky;
    top: 0;
+   left: 0;
    width: 100%;
    height: 100vh;
    height: 100dvh;
-   min-height: 36rem;
+   min-height: unset;
    display: flex;
    flex-direction: column;
    justify-content: center;
    align-items: center;
    overflow: hidden;
    z-index: 10;
-   padding: clamp(2rem, 5vh, 4rem) 0;
+   padding: clamp(1.5rem, 4vh, 3.5rem) 0;
    box-sizing: border-box;
 }
 
@@ -4419,24 +4461,29 @@ main.touch .case-intro-image .btn-wrap {
 
 @media screen and (max-width: 767px) {
    .horizontal-words {
-      height: 160vh;
+      height: 190vh;
+      overflow: visible;
    }
    .horizontal-words__content {
+      position: -webkit-sticky;
       position: sticky;
       top: 0;
+      left: 0;
       min-height: unset;
       height: 100vh;
       height: 100dvh;
-      padding: 1.5rem 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
    }
    .horizontal-words__h2 {
-      font-size: clamp(2.2rem, 8.5vw, 3.4rem);
+      font-size: clamp(2rem, 7.8vw, 3rem);
    }
    .horizontal-words__relative {
-      margin-left: 5vw;
-      margin-right: 5vw;
+      margin-left: 2vw;
+      margin-right: 2vw;
    }
    .horizontal-words__arrow-svg {
       width: 7.5rem;
@@ -4471,13 +4518,13 @@ main.touch .case-intro-image .btn-wrap {
    }
    .horizontal-words__bottom-text {
       position: relative;
-      margin-top: 1.75rem;
-      padding: 0 1.25rem;
+      margin-top: 2rem;
+      padding: 0 1.5rem;
    }
    .horizontal-words__bottom-text-l {
-      font-size: 0.92rem;
+      font-size: 0.95rem;
       line-height: 1.55;
-      max-width: 28em;
+      max-width: 26em;
    }
 }
 
