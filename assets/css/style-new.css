@@ -2131,9 +2131,9 @@ main.touch .main-wrap {
 }
 
 .single-about-image .overlay:nth-child(1) {
-   background: url("../img/about-nitish-portrait.jpg") center 22% / cover no-repeat;
+   background: url("../img/about-nitish-portrait.jpg") center 82% / cover no-repeat;
    top: -12%;
-   height: 124%;
+   height: 125%;
    width: 100%;
    will-change: transform;
 }
@@ -2209,8 +2209,8 @@ main.touch .main-wrap {
       width: 100%;
       left: 0;
       top: -12%;
-      height: 124%;
-      background: url("../img/about-nitish-portrait.jpg") center 22% / cover no-repeat;
+      height: 125%;
+      background: url("../img/about-nitish-portrait.jpg") center 82% / cover no-repeat;
       will-change: transform;
    }
 
@@ -3091,8 +3091,8 @@ main.touch .case-intro-image .btn-wrap {
 
    main.touch .case-intro-image .btn-wrap,
    .case-intro-image .btn-wrap { 
-      left: 1.25rem !important;
-      right: auto !important;
+      right: 1.5rem !important;
+      left: auto !important;
       top: 0;
       transform: translate(0, -50%);
    }
@@ -3194,35 +3194,64 @@ main.touch .case-intro-image .btn-wrap {
 
 @media screen and (max-width: 720px){
 
-   .footer-case-wrap .container.medium .row:nth-child(2) {
-      padding-bottom: calc(var(--section-padding) * 1);
+   .footer-case-wrap .footer {
+      padding-top: 1.5rem !important;
    }
 
    .footer-case-wrap .container.medium .row:nth-child(1) {
-      padding-bottom: calc(var(--section-padding) / .5); 
-      padding-bottom: 13em;
+      padding-top: 0 !important;
+      padding-bottom: 1.5rem !important;
+      text-align: center;
+   }
+
+   .footer-case-wrap .footer h2 {
+      font-size: clamp(2.2rem, 7.5vw, 3.2rem) !important;
+      line-height: 1.2;
+      text-align: center;
+      margin-bottom: 0.85rem;
    }
 
    .footer-case-wrap .tile-image-wrap {
-      width: 50vw;
+      position: relative !important;
+      left: auto !important;
+      bottom: auto !important;
+      transform: none !important;
+      width: clamp(16rem, 80vw, 25rem) !important;
+      margin: 0.75rem auto 1.5rem auto !important;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+   }
+
+   .footer-case-wrap .tile-image-wrap::before {
+      padding-bottom: 58% !important;
    }
 
    .footer-case-wrap .tile-image-wrap .tile-image {
-      transform: translateY(0%);
+      transform: none !important;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
    }
 
    .footer-case-wrap .next-case-btn:hover h2 {
       opacity: 1;
    }
+
+   .footer-case-wrap .container.medium .row:nth-child(2) {
+      padding-bottom: 1.5rem !important;
+   }
 }
 
 @media screen and (max-width: 540px){ 
    .footer-case-wrap .tile-image-wrap {
-      width: 70vw;
+      width: clamp(16rem, 88vw, 24rem) !important;
    }
 
    .footer-case-wrap .tile-image-wrap::before {
-      padding-bottom: 60%;
+      padding-bottom: 58% !important;
    }
 }
 
@@ -4208,28 +4237,7 @@ main.touch .case-intro-image .btn-wrap {
    pointer-events: none;
 }
 
-.screen-slider {
-   position: absolute;
-   top: 0;
-   left: 0;
-   width: 100%;
-   height: 100%;
-   overflow: hidden;
-   background: #000;
-   transform-style: preserve-3d;
-   -webkit-transform-style: preserve-3d;
-   will-change: transform;
-}
-
-.screen-slider .laptop-screen-slide {
-   position: absolute;
-   inset: 0;
-   width: 100%;
-   height: 100%;
-   background-size: cover;
-   background-position: top center;
-   will-change: opacity, transform;
-}
+/* Laptop Screen Slider styling handled at line 3729 with dynamic crossfade cycle */
 
 /* ------------------------- Smooth Scroll Optimizations -------------------------------------------------- */
 [data-scroll-container] {
@@ -4250,12 +4258,15 @@ main.touch .case-intro-image .btn-wrap {
 /* ------------------------- PatnaHost Kinetic Word Strewing Section ------------------------- */
 .horizontal-words {
    position: relative;
+   height: 220vh;
    background-color: var(--color-light, #f4f4f4);
    color: var(--color-dark, #111111);
-   overflow: hidden;
+   overflow: clip;
 }
 
 .horizontal-words__content {
+   position: sticky;
+   top: 0;
    width: 100%;
    height: 100vh;
    height: 100dvh;
@@ -4264,7 +4275,6 @@ main.touch .case-intro-image .btn-wrap {
    flex-direction: column;
    justify-content: center;
    align-items: center;
-   position: relative;
    overflow: hidden;
    z-index: 10;
    padding: clamp(2rem, 5vh, 4rem) 0;
@@ -4409,14 +4419,17 @@ main.touch .case-intro-image .btn-wrap {
 
 @media screen and (max-width: 767px) {
    .horizontal-words {
-      height: auto;
+      height: 160vh;
    }
    .horizontal-words__content {
+      position: sticky;
+      top: 0;
       min-height: unset;
       height: 100vh;
       height: 100dvh;
       padding: 1.5rem 0;
       justify-content: center;
+      align-items: center;
    }
    .horizontal-words__h2 {
       font-size: clamp(2.2rem, 8.5vw, 3.4rem);
@@ -4432,17 +4445,33 @@ main.touch .case-intro-image .btn-wrap {
       width: 3.2rem;
    }
    .horizontal-words__sticker-watch {
-      width: 3.5rem;
+      width: 3.2rem;
+      top: 40%;
+      transform: translate(-50%, -100%);
    }
    .horizontal-words__sticker-cursor {
-      width: 4.2rem;
+      width: 3.5rem;
+      top: 58%;
+      transform: translate(-50%, 15%);
    }
    .horizontal-words__sticker-phone {
-      width: 4.5rem;
+      width: 3.6rem;
+      top: 40%;
+      transform: translate(-50%, -95%);
+   }
+   .horizontal-words__sticker-floating.is--letsgo {
+      width: 3.2rem;
+      top: 36%;
+      transform: translate(-50%, -105%) rotate(-8deg);
+   }
+   .horizontal-words__sticker-floating.is--vibes {
+      width: 3.2rem;
+      top: 36%;
+      transform: translate(-50%, -105%) rotate(8deg);
    }
    .horizontal-words__bottom-text {
       position: relative;
-      margin-top: 2rem;
+      margin-top: 1.75rem;
       padding: 0 1.25rem;
    }
    .horizontal-words__bottom-text-l {
