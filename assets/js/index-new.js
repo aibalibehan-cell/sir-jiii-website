@@ -1658,35 +1658,26 @@ function initScrolltriggerAnimations() {
       }
 
       if(document.querySelector(".footer-case-wrap")) {
-        // Scrolltrigger Animation : Footer Case (Dynamic Case Opening on Mobile)
+        // Scrolltrigger Animation : Footer Case (Dynamic Case Opening on Mobile & Desktop)
         $(".footer-case-wrap").each(function () {
           let triggerElement = $(this);
-          let targetImage = $(this).find(".tile-image-wrap");
-          let targetOverlay = $(this).find(".overlay-image");
+          let targetTile = $(this).find(".tile-image-wrap .tile-image");
         
-          let tl = gsap.timeline({
-            scrollTrigger: {
-              trigger: triggerElement,
-              start: "top 95%",
-              end: "top 30%",
-              scrub: 0.5
-            }
-          });
-          if (targetImage.length) {
-            tl.from(targetImage, {
-              scale: 0.82,
-              opacity: 0.6,
-              y: 20,
-              ease: "power2.out"
-            }, 0);
-          }
-          if (targetOverlay.length) {
-            tl.fromTo(targetOverlay, {
-              yPercent: -10
+          if (targetTile.length) {
+            gsap.fromTo(targetTile[0], {
+              yPercent: 65,
+              opacity: 0.5
             }, {
-              yPercent: 8,
-              ease: "none"
-            }, 0);
+              yPercent: 0,
+              opacity: 1,
+              ease: "power2.out",
+              scrollTrigger: {
+                trigger: triggerElement[0],
+                start: "top 85%",
+                end: "center 70%",
+                scrub: 0.6
+              }
+            });
           }
         });
       }
@@ -1694,15 +1685,15 @@ function initScrolltriggerAnimations() {
       if(document.querySelector(".about-image .single-about-image .overlay:nth-child(1)")) {
         // Mobile Parallax: About Image Nitish portrait
         gsap.fromTo(".about-image .single-about-image .overlay:nth-child(1)", {
-          yPercent: -10
+          yPercent: -6
         }, {
-          yPercent: 12,
+          yPercent: 6,
           ease: "none",
           scrollTrigger: {
             trigger: ".about-image .single-about-image",
             start: "top bottom",
             end: "bottom top",
-            scrub: true
+            scrub: 0.8
           }
         });
       }
@@ -1944,6 +1935,7 @@ function initMWG11() {
 
       if (!$text.length) return;
 
+      const $content = $container.find('.horizontal-words__content');
       const scrollerEl = document.querySelector('[data-scroll-container]');
       const isMobile = window.innerWidth <= 767;
       const hasSmoothLoco = scroll && scroll.options && scroll.options.smooth && !isMobile;
@@ -1951,41 +1943,56 @@ function initMWG11() {
 
       // Kill previous ScrollTriggers for this container
       ScrollTrigger.getAll().forEach(st => {
-        if (st.trigger === $container[0] || (st.pin && st.pin === $container[0])) {
+        if (st.trigger === $container[0] || (st.pin && (st.pin === $container[0] || ($content.length && st.pin === $content[0])))) {
           st.kill();
         }
       });
 
-      const startX = isMobile ? 32 : 48;
-      const endX = isMobile ? -85 : -100;
+      // Start: begins showing initial phrase "we create digital experiences..."
+      // End: rests neatly at "...where businesses actually grow" with stickers & arrow visible (does NOT slide completely off!)
+      const startX = isMobile ? 12 : 20;
+      const endX = isMobile ? -62 : -52;
 
-      const scrollTween = gsap.fromTo($text, {
-        xPercent: startX
-      }, {
-        xPercent: endX,
-        ease: 'none',
+      // Master Timeline linked to ScrollTrigger with pinning
+      // On mobile, pin: $content[0] locks the section in viewport center; desktop uses Locomotive Scroll sticky target
+      const tl = gsap.timeline({
         scrollTrigger: {
           trigger: $container[0],
+          pin: isMobile ? $content[0] : false,
+          pinSpacing: false,
           scroller: scrollerTarget,
           start: "top top",
           end: "bottom bottom",
-          scrub: 0.5,
-          invalidateOnRefresh: true
+          scrub: 0.6,
+          invalidateOnRefresh: true,
+          anticipatePin: 1
         }
       });
+
+      // Slide text across for first 75% of the scroll timeline
+      tl.fromTo($text, {
+        xPercent: startX
+      }, {
+        xPercent: endX,
+        ease: 'power1.out',
+        duration: 0.75
+      }, 0);
+
+      // Remaining 25% is a resting hold: text stays locked in place while user finishes reading, then unpins smoothly!
+      tl.to({}, { duration: 0.25 }, 0.75);
 
       // Individual character bouncy physics: smooth glide that straightens quickly
       // Becomes 100% straight before reaching viewport center so it is always level and crisp!
       if ($letters.length) {
         $letters.each(function () {
           gsap.from(this, {
-            yPercent: (Math.random() - 0.5) * (isMobile ? 50 : 120),
-            rotation: (Math.random() - 0.5) * (isMobile ? 18 : 28),
+            yPercent: (Math.random() - 0.5) * (isMobile ? 40 : 100),
+            rotation: (Math.random() - 0.5) * (isMobile ? 14 : 24),
             ease: "power2.out",
             scrollTrigger: {
               trigger: this,
               scroller: scrollerTarget,
-              containerAnimation: scrollTween,
+              containerAnimation: tl,
               start: 'left 100%',
               end: isMobile ? 'left 66%' : 'left 60%',
               scrub: 0.35
@@ -1999,13 +2006,13 @@ function initMWG11() {
         $stickers.each(function () {
           gsap.from(this, {
             scale: 0.5,
-            yPercent: (Math.random() - 0.5) * (isMobile ? 50 : 100),
-            rotation: (Math.random() - 0.5) * (isMobile ? 14 : 20),
+            yPercent: (Math.random() - 0.5) * (isMobile ? 40 : 80),
+            rotation: (Math.random() - 0.5) * (isMobile ? 12 : 18),
             ease: "power2.out",
             scrollTrigger: {
               trigger: this,
               scroller: scrollerTarget,
-              containerAnimation: scrollTween,
+              containerAnimation: tl,
               start: 'left 100%',
               end: isMobile ? 'left 66%' : 'left 55%',
               scrub: 0.35
@@ -2023,7 +2030,7 @@ function initMWG11() {
             scrollTrigger: {
               trigger: this,
               scroller: scrollerTarget,
-              containerAnimation: scrollTween,
+              containerAnimation: tl,
               start: 'left 95%',
               end: 'left 40%',
               scrub: 0.5
