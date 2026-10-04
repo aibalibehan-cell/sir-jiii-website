@@ -1885,8 +1885,15 @@ function initMWG11() {
       const hasSmoothLoco = scroll && scroll.options && scroll.options.smooth && !isMobile;
       const scrollerTarget = hasSmoothLoco ? scrollerEl : window;
 
-      const startX = isMobile ? 0 : 30;
-      const endX = isMobile ? -75 : -85;
+      // Kill previous ScrollTriggers for this container to avoid duplicate pins
+      ScrollTrigger.getAll().forEach(st => {
+        if (st.trigger === $container[0] || (st.pin && st.pin === $container[0])) {
+          st.kill();
+        }
+      });
+
+      const startX = isMobile ? 8 : 28;
+      const endX = isMobile ? -80 : -85;
 
       const scrollTween = gsap.fromTo($text, {
         xPercent: startX
@@ -1896,47 +1903,51 @@ function initMWG11() {
         scrollTrigger: {
           trigger: $container[0],
           scroller: scrollerTarget,
-          start: "top top",
-          end: "bottom bottom",
-          scrub: isMobile ? 0.4 : 0.6,
+          pin: true,
+          pinSpacing: true,
+          start: isMobile ? "center center" : "top top",
+          end: isMobile ? "+=115%" : "+=170%",
+          scrub: isMobile ? 0.35 : 0.6,
+          anticipatePin: 1,
           invalidateOnRefresh: true
         }
       });
 
-      // Individual character bouncy physics: smooth, organic glide into line (no sudden snap/jhatka!)
+      // Individual character bouncy physics: smooth glide that straightens quickly
+      // Becomes 100% straight before reaching viewport center so it is always level and crisp!
       if ($letters.length) {
         $letters.each(function () {
           gsap.from(this, {
-            yPercent: (Math.random() - 0.5) * 160,
-            rotation: (Math.random() - 0.5) * 24,
-            ease: "sine.out",
+            yPercent: (Math.random() - 0.5) * (isMobile ? 70 : 140),
+            rotation: (Math.random() - 0.5) * (isMobile ? 18 : 24),
+            ease: "power2.out",
             scrollTrigger: {
               trigger: this,
               scroller: scrollerTarget,
               containerAnimation: scrollTween,
-              start: 'left 105%',
-              end: 'left 50%',
-              scrub: 0.5
+              start: 'left 100%',
+              end: isMobile ? 'left 78%' : 'left 60%',
+              scrub: 0.35
             }
           });
         });
       }
 
-      // Floating Stickers: gracefully glides & scales into place before center
+      // Floating Stickers: glide & scale into place before center
       if ($stickers.length) {
         $stickers.each(function () {
           gsap.from(this, {
-            scale: 0.45,
-            yPercent: (Math.random() - 0.5) * 130,
-            rotation: (Math.random() - 0.5) * 20,
-            ease: "sine.out",
+            scale: 0.5,
+            yPercent: (Math.random() - 0.5) * (isMobile ? 60 : 120),
+            rotation: (Math.random() - 0.5) * (isMobile ? 16 : 20),
+            ease: "power2.out",
             scrollTrigger: {
               trigger: this,
               scroller: scrollerTarget,
               containerAnimation: scrollTween,
-              start: 'left 105%',
-              end: 'left 50%',
-              scrub: 0.5
+              start: 'left 100%',
+              end: isMobile ? 'left 78%' : 'left 55%',
+              scrub: 0.35
             }
           });
         });
@@ -1953,8 +1964,8 @@ function initMWG11() {
               scroller: scrollerTarget,
               containerAnimation: scrollTween,
               start: 'left 95%',
-              end: 'left 30%',
-              scrub: 0.6
+              end: 'left 40%',
+              scrub: 0.5
             }
           });
         });
