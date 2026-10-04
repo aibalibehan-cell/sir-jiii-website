@@ -1466,7 +1466,7 @@ function initScrolltriggerAnimations() {
         trigger: triggerElement,
         start: "top 92%",
         end: "bottom 8%",
-        toggleActions: "play reverse play reverse"
+        toggleActions: "play none none none"
       }
     });
     tl.from(targetElementSticker, {
@@ -1637,25 +1637,89 @@ function initScrolltriggerAnimations() {
     "(max-width: 720px)": function() {
     
       if(document.querySelector(".footer-wrap")) {
-      // Scrolltrigger Animation : Footer
-      $(".footer-wrap").each(function (index) {
-        let triggerElement = $(this);
-        let targetElementRound = $(".footer-rounded-div .rounded-div-wrap");
-      
-        let tl = gsap.timeline({
-          scrollTrigger: {
-            trigger: triggerElement,
-            start: "0% 100%",
-            end: "100% 100%",
-            scrub: 0
+        // Scrolltrigger Animation : Footer
+        $(".footer-wrap").each(function (index) {
+          let triggerElement = $(this);
+          let targetElementRound = $(".footer-rounded-div .rounded-div-wrap");
+        
+          let tl = gsap.timeline({
+            scrollTrigger: {
+              trigger: triggerElement,
+              start: "0% 100%",
+              end: "100% 100%",
+              scrub: 0
+            }
+          });
+          tl.to(targetElementRound, {
+            height: 0,
+            ease: "none"
+          }, 0);
+        });
+      }
+
+      if(document.querySelector(".footer-case-wrap")) {
+        // Scrolltrigger Animation : Footer Case (Dynamic Case Opening on Mobile)
+        $(".footer-case-wrap").each(function () {
+          let triggerElement = $(this);
+          let targetImage = $(this).find(".tile-image-wrap");
+          let targetOverlay = $(this).find(".overlay-image");
+        
+          let tl = gsap.timeline({
+            scrollTrigger: {
+              trigger: triggerElement,
+              start: "top 95%",
+              end: "top 30%",
+              scrub: 0.5
+            }
+          });
+          if (targetImage.length) {
+            tl.from(targetImage, {
+              scale: 0.82,
+              opacity: 0.6,
+              y: 20,
+              ease: "power2.out"
+            }, 0);
+          }
+          if (targetOverlay.length) {
+            tl.fromTo(targetOverlay, {
+              yPercent: -10
+            }, {
+              yPercent: 8,
+              ease: "none"
+            }, 0);
           }
         });
-        tl.to(targetElementRound, {
-          height: 0,
-          ease: "none"
-        }, 0);
-      });
-    }
+      }
+
+      if(document.querySelector(".about-image .single-about-image .overlay:nth-child(1)")) {
+        // Mobile Parallax: About Image Nitish portrait
+        gsap.fromTo(".about-image .single-about-image .overlay:nth-child(1)", {
+          yPercent: -10
+        }, {
+          yPercent: 12,
+          ease: "none",
+          scrollTrigger: {
+            trigger: ".about-image .single-about-image",
+            start: "top bottom",
+            end: "bottom top",
+            scrub: true
+          }
+        });
+      }
+
+      if(document.querySelector(".home-header .personal-image")) {
+        // Mobile Parallax: Hero section Nitish portrait
+        gsap.to(".home-header .personal-image", {
+          yPercent: 16,
+          ease: "none",
+          scrollTrigger: {
+            trigger: ".home-header",
+            start: "top top",
+            end: "bottom top",
+            scrub: true
+          }
+        });
+      }
     
     } // End Mobile Only Scrolltrigger
   
@@ -1885,15 +1949,15 @@ function initMWG11() {
       const hasSmoothLoco = scroll && scroll.options && scroll.options.smooth && !isMobile;
       const scrollerTarget = hasSmoothLoco ? scrollerEl : window;
 
-      // Kill previous ScrollTriggers for this container to avoid duplicate pins
+      // Kill previous ScrollTriggers for this container
       ScrollTrigger.getAll().forEach(st => {
         if (st.trigger === $container[0] || (st.pin && st.pin === $container[0])) {
           st.kill();
         }
       });
 
-      const startX = isMobile ? 8 : 28;
-      const endX = isMobile ? -80 : -85;
+      const startX = isMobile ? 32 : 48;
+      const endX = isMobile ? -85 : -100;
 
       const scrollTween = gsap.fromTo($text, {
         xPercent: startX
@@ -1903,12 +1967,9 @@ function initMWG11() {
         scrollTrigger: {
           trigger: $container[0],
           scroller: scrollerTarget,
-          pin: true,
-          pinSpacing: true,
-          start: isMobile ? "center center" : "top top",
-          end: isMobile ? "+=115%" : "+=170%",
-          scrub: isMobile ? 0.35 : 0.6,
-          anticipatePin: 1,
+          start: "top top",
+          end: "bottom bottom",
+          scrub: 0.5,
           invalidateOnRefresh: true
         }
       });
@@ -1918,15 +1979,15 @@ function initMWG11() {
       if ($letters.length) {
         $letters.each(function () {
           gsap.from(this, {
-            yPercent: (Math.random() - 0.5) * (isMobile ? 70 : 140),
-            rotation: (Math.random() - 0.5) * (isMobile ? 18 : 24),
+            yPercent: (Math.random() - 0.5) * (isMobile ? 50 : 120),
+            rotation: (Math.random() - 0.5) * (isMobile ? 18 : 28),
             ease: "power2.out",
             scrollTrigger: {
               trigger: this,
               scroller: scrollerTarget,
               containerAnimation: scrollTween,
               start: 'left 100%',
-              end: isMobile ? 'left 78%' : 'left 60%',
+              end: isMobile ? 'left 66%' : 'left 60%',
               scrub: 0.35
             }
           });
@@ -1938,15 +1999,15 @@ function initMWG11() {
         $stickers.each(function () {
           gsap.from(this, {
             scale: 0.5,
-            yPercent: (Math.random() - 0.5) * (isMobile ? 60 : 120),
-            rotation: (Math.random() - 0.5) * (isMobile ? 16 : 20),
+            yPercent: (Math.random() - 0.5) * (isMobile ? 50 : 100),
+            rotation: (Math.random() - 0.5) * (isMobile ? 14 : 20),
             ease: "power2.out",
             scrollTrigger: {
               trigger: this,
               scroller: scrollerTarget,
               containerAnimation: scrollTween,
               start: 'left 100%',
-              end: isMobile ? 'left 78%' : 'left 55%',
+              end: isMobile ? 'left 66%' : 'left 55%',
               scrub: 0.35
             }
           });
