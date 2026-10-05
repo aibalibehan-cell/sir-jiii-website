@@ -1919,7 +1919,6 @@ function initMWG11() {
   const $containers = $('.horizontal-words');
   if (!$containers.length) return;
 
-  // Pre-split the text so it's ready
   $containers.each(function () {
     const $h2 = $(this).find('h2');
     if ($h2.length && !$h2.hasClass('split-done')) {
@@ -1941,7 +1940,6 @@ function initMWG11() {
       const hasSmoothLoco = scroll && scroll.options && scroll.options.smooth && !isMobile;
       const scrollerTarget = hasSmoothLoco ? scrollerEl : window;
 
-      // Kill previous ScrollTriggers
       ScrollTrigger.getAll().forEach(st => {
         if (st.trigger === $container[0] || st.trigger === $content[0] || (st.pin && (st.pin === $container[0] || st.pin === $content[0]))) {
           st.kill();
@@ -1951,9 +1949,7 @@ function initMWG11() {
       const textWidth = $text[0].scrollWidth || $text.outerWidth();
       const winWidth = window.innerWidth;
 
-      // Ensure it starts from a completely blank screen on the right
       const startX = winWidth; 
-
       const maxTravel = -(textWidth - winWidth + (winWidth * (isMobile ? 0.12 : 0.18)));
       const endX = maxTravel < 0 ? maxTravel : -textWidth * 0.45;
 
@@ -1974,7 +1970,6 @@ function initMWG11() {
         }
       });
 
-      // Slide the entire text container from right to left
       tl.fromTo($text[0], {
         x: startX
       }, {
@@ -1983,7 +1978,6 @@ function initMWG11() {
         duration: 1
       }, 0);
 
-      // The cool "explode/pop-in" animation for letters
       const letters = $container.find('.letter');
       if (letters.length) {
         tl.from(letters, {
@@ -2014,3 +2008,5 @@ function initMWG11() {
     setTimeout(runMWG, 300);
   }
 }
+
+
