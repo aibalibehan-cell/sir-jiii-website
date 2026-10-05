@@ -534,6 +534,9 @@ function initSmoothScroll(container) {
   if (scroll && scroll.on) {
     scroll.on("scroll", () => ScrollTrigger.update());
   }
+  window.addEventListener('scroll', () => {
+    ScrollTrigger.update();
+  });
 
   try {
     const scrollerTarget = container.querySelector('[data-scroll-container]') || scrollContainer;
@@ -1934,95 +1937,87 @@ function initMWG11() {
 
       if (!$text.length) return;
 
-      $content.removeAttr('data-scroll-sticky');
-      $content.removeAttr('data-scroll-target');
-
       const scrollerEl = document.querySelector('[data-scroll-container]');
       const isMobile = window.innerWidth <= 767;
       const hasSmoothLoco = scroll && scroll.options && scroll.options.smooth && !isMobile;
       const scrollerTarget = hasSmoothLoco ? scrollerEl : window;
 
+      // Kill previous ScrollTriggers for this container
       ScrollTrigger.getAll().forEach(st => {
-        if (st.trigger === $container[0] || (st.pin && st.pin === $container[0]) || (st.pin && st.pin === $content[0])) {
+        if (st.trigger === $container[0] || (st.pin && st.pin === $container[0])) {
           st.kill();
         }
       });
 
+      // Ensure text and letters never wrap
       $text.css({ 'white-space': 'nowrap', 'width': 'max-content', 'display': 'inline-block' });
       $letters.css({ 'white-space': 'nowrap', 'display': 'inline-block', 'will-change': 'transform' });
 
       const winWidth = window.innerWidth;
-      const textWidth = $text[0].scrollWidth || $text.outerWidth();
-
-      const startX = winWidth; 
-      const endX = -(textWidth + (winWidth * 0.1)); 
-
-      const trackHeight = isMobile ? (winWidth * 3) : (winWidth * 3.5);
-      $container.css({
-        'height': trackHeight + 'px',
-        'overflow': 'hidden'
-      });
+      const textWidth = $text[0].scrollWidth || $text.outerWidth() || 2000;
+      const marginLeft = parseFloat($text.css('margin-left')) || (winWidth * (isMobile ? 0.04 : 0.1));
+      
+      // Calculate exact shift to place the start of text completely outside the right edge of the screen (blank screen first!):
+      const shiftX = Math.max(winWidth - marginLeft + 40, winWidth * 0.95);
+      const startXPercent = Math.max((shiftX / textWidth) * 100, isMobile ? 38 : 58);
+      const endXPercent = isMobile ? -85 : -95;
 
       const scrollTween = gsap.fromTo($text, {
-        x: startX,
-        xPercent: 0
+        xPercent: startXPercent
       }, {
-        x: endX,
-        xPercent: 0,
+        xPercent: endXPercent,
         ease: 'none',
         scrollTrigger: {
           trigger: $container[0],
-          pin: $content[0], 
-          pinSpacing: false, 
           scroller: scrollerTarget,
           start: "top top",
           end: "bottom bottom",
-          scrub: 0.5,
-          invalidateOnRefresh: true,
-          anticipatePin: 1
+          scrub: isMobile ? 0.4 : 0.6,
+          invalidateOnRefresh: true
         }
       });
 
+      // Individual character bouncy physics: smooth glide that straightens quickly
+      // Becomes 100% straight before reaching viewport center so it is always level and crisp!
       if ($letters.length) {
         $letters.each(function () {
           gsap.from(this, {
-            yPercent: (Math.random() - 0.5) * (isMobile ? 100 : 150),
-            rotation: (Math.random() - 0.5) * (isMobile ? 25 : 45),
-            scale: () => gsap.utils.random(0.5, 1.5),
-            opacity: 0,
-            ease: "power3.out",
+            yPercent: (Math.random() - 0.5) * (isMobile ? 80 : 140),
+            rotation: (Math.random() - 0.5) * (isMobile ? 18 : 24),
+            ease: "sine.out",
             scrollTrigger: {
               trigger: this,
               scroller: scrollerTarget,
               containerAnimation: scrollTween,
-              start: 'left 110%',
-              end: isMobile ? 'left 60%' : 'left 50%',
-              scrub: 0.5
+              start: 'left 105%',
+              end: isMobile ? 'left 70%' : 'left 55%',
+              scrub: 0.4
             }
           });
         });
       }
 
+      // Floating Stickers: glide & scale into place before center
       if ($stickers.length) {
         $stickers.each(function () {
           gsap.from(this, {
-            scale: 0,
-            yPercent: (Math.random() - 0.5) * 100,
-            rotation: (Math.random() - 0.5) * 30,
-            opacity: 0,
-            ease: "back.out(1.5)",
+            scale: 0.45,
+            yPercent: (Math.random() - 0.5) * 120,
+            rotation: (Math.random() - 0.5) * 20,
+            ease: "sine.out",
             scrollTrigger: {
               trigger: this,
               scroller: scrollerTarget,
               containerAnimation: scrollTween,
-              start: 'left 110%',
-              end: isMobile ? 'left 60%' : 'left 50%',
-              scrub: 0.5
+              start: 'left 105%',
+              end: isMobile ? 'left 70%' : 'left 55%',
+              scrub: 0.4
             }
           });
         });
       }
 
+      // Draw hand-drawn SVG arrows
       if ($arrow.length && typeof DrawSVGPlugin !== 'undefined') {
         $arrow.each(function () {
           gsap.from(this, {
@@ -2032,9 +2027,9 @@ function initMWG11() {
               trigger: this,
               scroller: scrollerTarget,
               containerAnimation: scrollTween,
-              start: 'left 100%',
-              end: 'left 40%',
-              scrub: 0.5
+              start: 'left 95%',
+              end: 'left 30%',
+              scrub: 0.6
             }
           });
         });
