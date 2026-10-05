@@ -535,25 +535,34 @@ function initSmoothScroll(container) {
     scroll.on("scroll", () => ScrollTrigger.update());
   }
 
+  const isMobile = window.innerWidth <= 767;
+  const hasSmoothLoco = scroll && scroll.options && scroll.options.smooth && !isMobile;
+
   try {
     const scrollerTarget = container.querySelector('[data-scroll-container]') || scrollContainer;
-    ScrollTrigger.scrollerProxy(scrollerTarget, {
-      scrollTop(value) {
-        if (arguments.length) {
-          if (scroll && scroll.scrollTo) scroll.scrollTo(value, 0, 0);
-        } else {
-          return (scroll && scroll.scroll && scroll.scroll.instance && scroll.scroll.instance.scroll) ? scroll.scroll.instance.scroll.y : window.pageYOffset;
-        }
-      },
-      getBoundingClientRect() {
-        return {top: 0, left: 0, width: window.innerWidth, height: window.innerHeight};
-      },
-      pinType: (scrollerTarget.style && scrollerTarget.style.transform) ? "transform" : "fixed"
-    });
+    if (hasSmoothLoco) {
+      ScrollTrigger.scrollerProxy(scrollerTarget, {
+        scrollTop(value) {
+          if (arguments.length) {
+            if (scroll && scroll.scrollTo) scroll.scrollTo(value, 0, 0);
+          } else {
+            return (scroll && scroll.scroll && scroll.scroll.instance && scroll.scroll.instance.scroll) ? scroll.scroll.instance.scroll.y : window.pageYOffset;
+          }
+        },
+        getBoundingClientRect() {
+          return {top: 0, left: 0, width: window.innerWidth, height: window.innerHeight};
+        },
+        pinType: (scrollerTarget.style && scrollerTarget.style.transform) ? "transform" : "fixed"
+      });
 
-    ScrollTrigger.defaults({
-      scroller: scrollerTarget,
-    });
+      ScrollTrigger.defaults({
+        scroller: scrollerTarget,
+      });
+    } else {
+      ScrollTrigger.defaults({
+        scroller: window,
+      });
+    }
   } catch (e) {
     console.warn('ScrollTrigger scrollerProxy error:', e);
   }
@@ -1658,42 +1667,40 @@ function initScrolltriggerAnimations() {
       }
 
       if(document.querySelector(".footer-case-wrap")) {
-        // Scrolltrigger Animation : Footer Case (Dynamic Case Opening on Mobile & Desktop)
+        // Scrolltrigger Animation : Footer Case (Dynamic Case Opening on Mobile)
         $(".footer-case-wrap").each(function () {
           let triggerElement = $(this);
           let targetTile = $(this).find(".tile-image-wrap .tile-image");
         
           if (targetTile.length) {
             gsap.fromTo(targetTile[0], {
-              yPercent: 65,
-              opacity: 0.5
+              yPercent: 75
             }, {
               yPercent: 0,
-              opacity: 1,
-              ease: "power2.out",
+              ease: "none",
               scrollTrigger: {
                 trigger: triggerElement[0],
-                start: "top 85%",
-                end: "center 70%",
-                scrub: 0.6
+                scroller: window,
+                start: "top 90%",
+                end: "bottom 95%",
+                scrub: true
               }
             });
           }
         });
       }
 
-      if(document.querySelector(".about-image .single-about-image .overlay:nth-child(1)")) {
-        // Mobile Parallax: About Image Nitish portrait
-        gsap.fromTo(".about-image .single-about-image .overlay:nth-child(1)", {
-          yPercent: -6
-        }, {
-          yPercent: 6,
+      if(document.querySelector(".about-image .single-about-image .overlay-image")) {
+        // Mobile Parallax: About Image Nitish portrait (matches home hero smooth parallax, zero jitter)
+        gsap.to(".about-image .single-about-image .overlay-image", {
+          yPercent: 14,
           ease: "none",
           scrollTrigger: {
-            trigger: ".about-image .single-about-image",
+            trigger: ".about-image",
+            scroller: window,
             start: "top bottom",
             end: "bottom top",
-            scrub: 0.8
+            scrub: true
           }
         });
       }
@@ -1915,129 +1922,60 @@ function initMWG11() {
   function runMWG() {
     $containers.each(function () {
       const $container = $(this);
-      const $h2 = $container.find('.horizontal-words__h2');
-
-      if ($h2.length && typeof SplitText !== 'undefined' && !$h2.find('.letter').length) {
-        try {
-          SplitText.create($h2[0], {
-            type: "chars",
-            charsClass: "letter"
-          });
-        } catch (e) {
-          console.warn('SplitText error:', e);
-        }
-      }
-
-      const $text = $container.find('.horizontal-words__relative');
-      const $letters = $container.find('.letter');
-      const $stickers = $container.find('.horizontal-words__sticker-svg, .horizontal-words__sticker-floating');
-      const $arrow = $container.find('.horizontal-words__arrow-svg path, .horizontal-words__arrow-end-svg path');
-
-      if (!$text.length) return;
-
       const $content = $container.find('.horizontal-words__content');
-      const scrollerEl = document.querySelector('[data-scroll-container]');
+      const $text = $container.find('.horizontal-words__relative');
+
+      if (!$text.length || !$content.length) return;
+
       const isMobile = window.innerWidth <= 767;
+      const scrollerEl = document.querySelector('[data-scroll-container]');
       const hasSmoothLoco = scroll && scroll.options && scroll.options.smooth && !isMobile;
       const scrollerTarget = hasSmoothLoco ? scrollerEl : window;
 
-      // Kill previous ScrollTriggers for this container
+      // Kill previous ScrollTriggers for this container/content
       ScrollTrigger.getAll().forEach(st => {
-        if (st.trigger === $container[0] || (st.pin && (st.pin === $container[0] || ($content.length && st.pin === $content[0])))) {
+        if (st.trigger === $container[0] || st.trigger === $content[0] || (st.pin && (st.pin === $container[0] || st.pin === $content[0]))) {
           st.kill();
         }
       });
 
-      // Start: begins showing initial phrase "we create digital experiences..."
-      // End: rests neatly at "...where businesses actually grow" with stickers & arrow visible (does NOT slide completely off!)
-      const startX = isMobile ? 12 : 20;
-      const endX = isMobile ? -62 : -52;
+      const textWidth = $text[0].scrollWidth || $text.outerWidth();
+      const winWidth = window.innerWidth;
 
-      // Master Timeline linked to ScrollTrigger with pinning
-      // On mobile, pin: $content[0] locks the section in viewport center; desktop uses Locomotive Scroll sticky target
+      // Clean white screen start: text enters smoothly from right
+      const startX = winWidth * (isMobile ? 0.95 : 0.85);
+
+      // Settle position: "...where businesses actually grow" is framed in center with stickers & arrow visible
+      const maxTravel = -(textWidth - winWidth + (winWidth * (isMobile ? 0.12 : 0.18)));
+      const endX = maxTravel < 0 ? maxTravel : -textWidth * 0.45;
+
+      const useSTPin = isMobile || !hasSmoothLoco;
+
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: $container[0],
-          pin: isMobile ? $content[0] : false,
-          pinSpacing: false,
+          pin: useSTPin ? $content[0] : false,
+          pinSpacing: useSTPin ? true : false,
           scroller: scrollerTarget,
           start: "top top",
-          end: "bottom bottom",
-          scrub: 0.6,
+          end: useSTPin ? "+=" + pinDistance : "bottom bottom",
+          scrub: isMobile ? 0.5 : 0.8,
           invalidateOnRefresh: true,
           anticipatePin: 1
         }
       });
 
-      // Slide text across for first 75% of the scroll timeline
-      tl.fromTo($text, {
-        xPercent: startX
+      // 0.0 to 0.72: Buttery-smooth linear slide across (100% tied to scroll, no abrupt jumps)
+      tl.fromTo($text[0], {
+        x: startX
       }, {
-        xPercent: endX,
-        ease: 'power1.out',
-        duration: 0.75
+        x: endX,
+        ease: "none",
+        duration: 0.72
       }, 0);
 
-      // Remaining 25% is a resting hold: text stays locked in place while user finishes reading, then unpins smoothly!
-      tl.to({}, { duration: 0.25 }, 0.75);
-
-      // Individual character bouncy physics: smooth glide that straightens quickly
-      // Becomes 100% straight before reaching viewport center so it is always level and crisp!
-      if ($letters.length) {
-        $letters.each(function () {
-          gsap.from(this, {
-            yPercent: (Math.random() - 0.5) * (isMobile ? 40 : 100),
-            rotation: (Math.random() - 0.5) * (isMobile ? 14 : 24),
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: this,
-              scroller: scrollerTarget,
-              containerAnimation: tl,
-              start: 'left 100%',
-              end: isMobile ? 'left 66%' : 'left 60%',
-              scrub: 0.35
-            }
-          });
-        });
-      }
-
-      // Floating Stickers: glide & scale into place before center
-      if ($stickers.length) {
-        $stickers.each(function () {
-          gsap.from(this, {
-            scale: 0.5,
-            yPercent: (Math.random() - 0.5) * (isMobile ? 40 : 80),
-            rotation: (Math.random() - 0.5) * (isMobile ? 12 : 18),
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: this,
-              scroller: scrollerTarget,
-              containerAnimation: tl,
-              start: 'left 100%',
-              end: isMobile ? 'left 66%' : 'left 55%',
-              scrub: 0.35
-            }
-          });
-        });
-      }
-
-      // Draw hand-drawn SVG arrows
-      if ($arrow.length && typeof DrawSVGPlugin !== 'undefined') {
-        $arrow.each(function () {
-          gsap.from(this, {
-            drawSVG: '0% 0%',
-            duration: 1,
-            scrollTrigger: {
-              trigger: this,
-              scroller: scrollerTarget,
-              containerAnimation: tl,
-              start: 'left 95%',
-              end: 'left 40%',
-              scrub: 0.5
-            }
-          });
-        });
-      }
+      // 0.72 to 1.0: Reading hold (locks text in place so user reads before unpinning)
+      tl.to({}, { duration: 0.28 }, 0.72);
     });
 
     if (window.locoScroll && window.locoScroll.update) {
