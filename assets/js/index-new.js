@@ -1690,9 +1690,9 @@ function initScrolltriggerAnimations() {
         });
       }
 
-      if(document.querySelector(".about-image .single-about-image .overlay-image")) {
+      if(document.querySelector(".about-image .single-about-image .overlay")) {
         // Mobile Parallax: About Image Nitish portrait (matches home hero smooth parallax, zero jitter)
-        gsap.to(".about-image .single-about-image .overlay-image", {
+        gsap.to(".about-image .single-about-image .overlay", {
           yPercent: 14,
           ease: "none",
           scrollTrigger: {
@@ -1919,6 +1919,15 @@ function initMWG11() {
   const $containers = $('.horizontal-words');
   if (!$containers.length) return;
 
+  // Pre-split the text so it's ready
+  $containers.each(function () {
+    const $h2 = $(this).find('h2');
+    if ($h2.length && !$h2.hasClass('split-done')) {
+      new SplitText($h2[0], { type: "words,chars", charsClass: "letter" });
+      $h2.addClass('split-done');
+    }
+  });
+
   function runMWG() {
     $containers.each(function () {
       const $container = $(this);
@@ -1932,7 +1941,7 @@ function initMWG11() {
       const hasSmoothLoco = scroll && scroll.options && scroll.options.smooth && !isMobile;
       const scrollerTarget = hasSmoothLoco ? scrollerEl : window;
 
-      // Kill previous ScrollTriggers for this container/content
+      // Kill previous ScrollTriggers
       ScrollTrigger.getAll().forEach(st => {
         if (st.trigger === $container[0] || st.trigger === $content[0] || (st.pin && (st.pin === $container[0] || st.pin === $content[0]))) {
           st.kill();
@@ -1942,14 +1951,14 @@ function initMWG11() {
       const textWidth = $text[0].scrollWidth || $text.outerWidth();
       const winWidth = window.innerWidth;
 
-      // Clean white screen start: text enters smoothly from right
-      const startX = winWidth * (isMobile ? 0.95 : 0.85);
+      // Ensure it starts from a completely blank screen on the right
+      const startX = winWidth; 
 
-      // Settle position: "...where businesses actually grow" is framed in center with stickers & arrow visible
       const maxTravel = -(textWidth - winWidth + (winWidth * (isMobile ? 0.12 : 0.18)));
       const endX = maxTravel < 0 ? maxTravel : -textWidth * 0.45;
 
       const useSTPin = isMobile || !hasSmoothLoco;
+      const pinDistance = isMobile ? winWidth * 1.8 : winWidth * 3;
 
       const tl = gsap.timeline({
         scrollTrigger: {
@@ -1959,23 +1968,38 @@ function initMWG11() {
           scroller: scrollerTarget,
           start: "top top",
           end: useSTPin ? "+=" + pinDistance : "bottom bottom",
-          scrub: isMobile ? 0.5 : 0.8,
+          scrub: 1,
           invalidateOnRefresh: true,
           anticipatePin: 1
         }
       });
 
-      // 0.0 to 0.72: Buttery-smooth linear slide across (100% tied to scroll, no abrupt jumps)
+      // Slide the entire text container from right to left
       tl.fromTo($text[0], {
         x: startX
       }, {
         x: endX,
         ease: "none",
-        duration: 0.72
+        duration: 1
       }, 0);
 
-      // 0.72 to 1.0: Reading hold (locks text in place so user reads before unpinning)
-      tl.to({}, { duration: 0.28 }, 0.72);
+      // The cool "explode/pop-in" animation for letters
+      const letters = $container.find('.letter');
+      if (letters.length) {
+        tl.from(letters, {
+          yPercent: () => gsap.utils.random(-200, 200),
+          xPercent: () => gsap.utils.random(-200, 200),
+          rotation: () => gsap.utils.random(-180, 180),
+          scale: () => gsap.utils.random(0.1, 2.5),
+          opacity: 0,
+          duration: 0.6,
+          stagger: {
+            amount: 0.5,
+            from: "start"
+          },
+          ease: "back.out(1.5)"
+        }, 0.1);
+      }
     });
 
     if (window.locoScroll && window.locoScroll.update) {
