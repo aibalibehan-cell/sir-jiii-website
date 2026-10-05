@@ -535,34 +535,25 @@ function initSmoothScroll(container) {
     scroll.on("scroll", () => ScrollTrigger.update());
   }
 
-  const isMobile = window.innerWidth <= 767;
-  const hasSmoothLoco = scroll && scroll.options && scroll.options.smooth && !isMobile;
-
   try {
     const scrollerTarget = container.querySelector('[data-scroll-container]') || scrollContainer;
-    if (hasSmoothLoco) {
-      ScrollTrigger.scrollerProxy(scrollerTarget, {
-        scrollTop(value) {
-          if (arguments.length) {
-            if (scroll && scroll.scrollTo) scroll.scrollTo(value, 0, 0);
-          } else {
-            return (scroll && scroll.scroll && scroll.scroll.instance && scroll.scroll.instance.scroll) ? scroll.scroll.instance.scroll.y : window.pageYOffset;
-          }
-        },
-        getBoundingClientRect() {
-          return {top: 0, left: 0, width: window.innerWidth, height: window.innerHeight};
-        },
-        pinType: (scrollerTarget.style && scrollerTarget.style.transform) ? "transform" : "fixed"
-      });
+    ScrollTrigger.scrollerProxy(scrollerTarget, {
+      scrollTop(value) {
+        if (arguments.length) {
+          if (scroll && scroll.scrollTo) scroll.scrollTo(value, 0, 0);
+        } else {
+          return (scroll && scroll.scroll && scroll.scroll.instance && scroll.scroll.instance.scroll) ? scroll.scroll.instance.scroll.y : window.pageYOffset;
+        }
+      },
+      getBoundingClientRect() {
+        return {top: 0, left: 0, width: window.innerWidth, height: window.innerHeight};
+      },
+      pinType: (scrollerTarget.style && scrollerTarget.style.transform) ? "transform" : "fixed"
+    });
 
-      ScrollTrigger.defaults({
-        scroller: scrollerTarget,
-      });
-    } else {
-      ScrollTrigger.defaults({
-        scroller: window,
-      });
-    }
+    ScrollTrigger.defaults({
+      scroller: scrollerTarget,
+    });
   } catch (e) {
     console.warn('ScrollTrigger scrollerProxy error:', e);
   }
@@ -1943,82 +1934,95 @@ function initMWG11() {
 
       if (!$text.length) return;
 
+      $content.removeAttr('data-scroll-sticky');
+      $content.removeAttr('data-scroll-target');
+
       const scrollerEl = document.querySelector('[data-scroll-container]');
       const isMobile = window.innerWidth <= 767;
       const hasSmoothLoco = scroll && scroll.options && scroll.options.smooth && !isMobile;
       const scrollerTarget = hasSmoothLoco ? scrollerEl : window;
 
-      // Kill previous ScrollTriggers for this container
       ScrollTrigger.getAll().forEach(st => {
         if (st.trigger === $container[0] || (st.pin && st.pin === $container[0]) || (st.pin && st.pin === $content[0])) {
           st.kill();
         }
       });
 
-      const startX = isMobile ? 32 : 48;
-      const endX = isMobile ? -85 : -100;
-      const useSTPin = isMobile || !hasSmoothLoco;
-      const pinDistance = isMobile ? window.innerWidth * 1.8 : window.innerWidth * 3;
+      $text.css({ 'white-space': 'nowrap', 'width': 'max-content', 'display': 'inline-block' });
+      $letters.css({ 'white-space': 'nowrap', 'display': 'inline-block', 'will-change': 'transform' });
+
+      const winWidth = window.innerWidth;
+      const textWidth = $text[0].scrollWidth || $text.outerWidth();
+
+      const startX = winWidth; 
+      const endX = -(textWidth + (winWidth * 0.1)); 
+
+      const trackHeight = isMobile ? (winWidth * 3) : (winWidth * 3.5);
+      $container.css({
+        'height': trackHeight + 'px',
+        'overflow': 'hidden'
+      });
 
       const scrollTween = gsap.fromTo($text, {
-        xPercent: startX
+        x: startX,
+        xPercent: 0
       }, {
-        xPercent: endX,
+        x: endX,
+        xPercent: 0,
         ease: 'none',
         scrollTrigger: {
           trigger: $container[0],
-          pin: useSTPin ? $content[0] : false,
-          pinSpacing: useSTPin ? true : false,
+          pin: $content[0], 
+          pinSpacing: false, 
           scroller: scrollerTarget,
           start: "top top",
-          end: useSTPin ? "+=" + pinDistance : "bottom bottom",
+          end: "bottom bottom",
           scrub: 0.5,
           invalidateOnRefresh: true,
           anticipatePin: 1
         }
       });
 
-      // Individual character bouncy physics: smooth glide that straightens quickly
-      // Becomes 100% straight before reaching viewport center so it is always level and crisp!
       if ($letters.length) {
         $letters.each(function () {
           gsap.from(this, {
-            yPercent: (Math.random() - 0.5) * (isMobile ? 50 : 120),
-            rotation: (Math.random() - 0.5) * (isMobile ? 18 : 28),
-            ease: "power2.out",
+            yPercent: (Math.random() - 0.5) * (isMobile ? 100 : 150),
+            rotation: (Math.random() - 0.5) * (isMobile ? 25 : 45),
+            scale: () => gsap.utils.random(0.5, 1.5),
+            opacity: 0,
+            ease: "power3.out",
             scrollTrigger: {
               trigger: this,
               scroller: scrollerTarget,
               containerAnimation: scrollTween,
-              start: 'left 100%',
-              end: isMobile ? 'left 66%' : 'left 60%',
-              scrub: 0.35
+              start: 'left 110%',
+              end: isMobile ? 'left 60%' : 'left 50%',
+              scrub: 0.5
             }
           });
         });
       }
 
-      // Floating Stickers: glide & scale into place before center
       if ($stickers.length) {
         $stickers.each(function () {
           gsap.from(this, {
-            scale: 0.5,
-            yPercent: (Math.random() - 0.5) * (isMobile ? 50 : 100),
-            rotation: (Math.random() - 0.5) * (isMobile ? 14 : 20),
-            ease: "power2.out",
+            scale: 0,
+            yPercent: (Math.random() - 0.5) * 100,
+            rotation: (Math.random() - 0.5) * 30,
+            opacity: 0,
+            ease: "back.out(1.5)",
             scrollTrigger: {
               trigger: this,
               scroller: scrollerTarget,
               containerAnimation: scrollTween,
-              start: 'left 100%',
-              end: isMobile ? 'left 66%' : 'left 55%',
-              scrub: 0.35
+              start: 'left 110%',
+              end: isMobile ? 'left 60%' : 'left 50%',
+              scrub: 0.5
             }
           });
         });
       }
 
-      // Draw hand-drawn SVG arrows
       if ($arrow.length && typeof DrawSVGPlugin !== 'undefined') {
         $arrow.each(function () {
           gsap.from(this, {
@@ -2028,7 +2032,7 @@ function initMWG11() {
               trigger: this,
               scroller: scrollerTarget,
               containerAnimation: scrollTween,
-              start: 'left 95%',
+              start: 'left 100%',
               end: 'left 40%',
               scrub: 0.5
             }
