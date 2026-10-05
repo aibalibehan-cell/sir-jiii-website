@@ -43,6 +43,16 @@ main.touch .main-wrap {
    }
    .main-wrap {
       position: relative;
+      will-change: auto !important;
+      transform: none !important;
+   }
+   [data-scroll-container] {
+      will-change: auto !important;
+      transform: none !important;
+   }
+   [data-scroll-section] {
+      will-change: auto !important;
+      transform: none !important;
    }
 }
 
@@ -1027,10 +1037,10 @@ main.touch .main-wrap {
    max-width: 14em;
 }
 
-@media screen and (max-width: 720px){
+@media screen and (max-width: 900px){
 
    .home-intro {
-      padding-bottom: calc(var(--section-padding) * 1);
+      padding-bottom: calc(var(--section-padding) * 0.85);
    }
 
    .home-intro .flex-col:nth-child(1) {
@@ -1053,7 +1063,7 @@ main.touch .main-wrap {
    }
 
    .home-intro .flex-col:nth-child(2) p {
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.25rem !important;
       padding-top: 0;
       max-width: 100%;
    }
@@ -1062,12 +1072,19 @@ main.touch .main-wrap {
       position: relative !important;
       top: auto !important;
       bottom: auto !important;
-      right: auto !important;
+      left: auto !important;
+      right: 0 !important;
       transform: none !important;
-      align-self: flex-end;
-      width: clamp(5.2rem, 18vw, 6.8rem) !important;
-      height: clamp(5.2rem, 18vw, 6.8rem) !important;
-      margin-top: 0.5rem;
+      align-self: flex-end !important;
+      margin-left: auto !important;
+      margin-top: 0.75rem !important;
+      width: clamp(4.2rem, 14vw, 5.2rem) !important;
+      height: clamp(4.2rem, 14vw, 5.2rem) !important;
+      z-index: 5;
+   }
+
+   .home-intro .flex-col:nth-child(2) .btn[data-scroll] {
+      transform: none !important;
    }
 
    .home-intro .flex-col:nth-child(2) .btn .btn-click {
@@ -1076,7 +1093,8 @@ main.touch .main-wrap {
    }
 
    .home-intro .flex-col:nth-child(2) .btn .btn-text-inner {
-      font-size: 0.85rem !important;
+      font-size: 0.78rem !important;
+      white-space: nowrap;
    }
 }
 
@@ -2075,7 +2093,7 @@ main.touch .main-wrap {
 
 }
 
-@media screen and (max-width: 720px) {
+@media screen and (max-width: 720px), (hover: none) {
    .line-globe {
       overflow: visible;
       padding-bottom: 1.5rem;
@@ -2087,7 +2105,9 @@ main.touch .main-wrap {
       transform: translate(0, -50%) !important;
       animation: digitalball 5s ease-in-out infinite !important;
    }
-   .line-globe .digital-ball .overlay {
+   .digital-ball .overlay,
+   .line-globe .digital-ball .overlay,
+   .home-header .hanger .digital-ball .overlay {
       opacity: 1 !important;
       animation: digitalball 5s ease-in-out infinite !important;
    }
@@ -3277,7 +3297,8 @@ main.touch .case-intro-image .btn-wrap {
       margin: 0.5rem auto 1.5rem auto !important;
       border-radius: 14px;
       overflow: hidden !important;
-      box-shadow: 0 12px 35px rgba(0,0,0,0.45);
+      background: transparent !important;
+      box-shadow: none !important;
    }
 
    .footer-case-wrap .tile-image-wrap::before {
@@ -3285,12 +3306,15 @@ main.touch .case-intro-image .btn-wrap {
    }
 
    .footer-case-wrap .tile-image-wrap .tile-image {
-      transform: translateY(75%);
+      transform: translateY(45%);
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 12px 35px rgba(0,0,0,0.45);
       will-change: transform;
    }
 
@@ -4317,7 +4341,7 @@ main.touch .case-intro-image .btn-wrap {
 /* ------------------------- PatnaHost Kinetic Word Strewing Section ------------------------- */
 .horizontal-words {
    position: relative;
-   height: 220vh;
+   height: 165vh;
    background-color: var(--color-light, #f4f4f4);
    color: var(--color-dark, #111111);
    overflow: visible;
@@ -4345,8 +4369,8 @@ main.touch .case-intro-image .btn-wrap {
 .horizontal-words__relative {
    position: relative;
    white-space: nowrap;
-   margin-left: 10vw;
-   margin-right: 10vw;
+   margin-left: 0;
+   margin-right: 0;
    will-change: transform;
 }
 
@@ -4481,14 +4505,13 @@ main.touch .case-intro-image .btn-wrap {
 @media screen and (max-width: 767px) {
    .horizontal-words {
       position: relative;
-      height: 220vh !important;
+      height: 100vh;
       overflow: visible;
    }
    .horizontal-words__content {
-      position: -webkit-sticky !important;
-      position: sticky !important;
-      top: 0 !important;
-      left: 0 !important;
+      position: relative;
+      top: 0;
+      left: 0;
       width: 100%;
       height: 100vh;
       height: 100dvh;
@@ -4503,10 +4526,15 @@ main.touch .case-intro-image .btn-wrap {
       font-size: clamp(2.2rem, 8vw, 3.2rem);
    }
    .horizontal-words__relative {
-      margin: 0 4vw;
+      margin: 0;
+   }
+   .horizontal-words .letter {
+      display: inline-block;
+      vertical-align: baseline;
+      transform: none;
    }
    .home-why-website {
-      padding-top: 2.5rem !important;
+      padding-top: 1.5rem !important;
       padding-bottom: 2rem !important;
    }
    .home-why-choose {
