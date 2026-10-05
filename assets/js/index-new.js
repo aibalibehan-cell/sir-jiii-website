@@ -1919,44 +1919,52 @@ function initMWG11() {
   const $containers = $('.horizontal-words');
   if (!$containers.length) return;
 
-  $containers.each(function () {
-    const $h2 = $(this).find('h2');
-    if ($h2.length && !$h2.hasClass('split-done')) {
-      new SplitText($h2[0], { type: "words,chars", charsClass: "letter" });
-      $h2.addClass('split-done');
-    }
-  });
-
   function runMWG() {
     $containers.each(function () {
       const $container = $(this);
+      const $h2 = $container.find('.horizontal-words__h2');
+
+      if ($h2.length && typeof SplitText !== 'undefined' && !$h2.find('.letter').length) {
+        try {
+          SplitText.create($h2[0], {
+            type: "chars",
+            charsClass: "letter"
+          });
+        } catch (e) {
+          console.warn('SplitText error:', e);
+        }
+      }
+
       const $content = $container.find('.horizontal-words__content');
       const $text = $container.find('.horizontal-words__relative');
+      const $letters = $container.find('.letter');
+      const $stickers = $container.find('.horizontal-words__sticker-svg, .horizontal-words__sticker-floating');
+      const $arrow = $container.find('.horizontal-words__arrow-svg path, .horizontal-words__arrow-end-svg path');
 
-      if (!$text.length || !$content.length) return;
+      if (!$text.length) return;
 
-      const isMobile = window.innerWidth <= 767;
       const scrollerEl = document.querySelector('[data-scroll-container]');
+      const isMobile = window.innerWidth <= 767;
       const hasSmoothLoco = scroll && scroll.options && scroll.options.smooth && !isMobile;
       const scrollerTarget = hasSmoothLoco ? scrollerEl : window;
 
+      // Kill previous ScrollTriggers for this container
       ScrollTrigger.getAll().forEach(st => {
-        if (st.trigger === $container[0] || st.trigger === $content[0] || (st.pin && (st.pin === $container[0] || st.pin === $content[0]))) {
+        if (st.trigger === $container[0] || (st.pin && st.pin === $container[0]) || (st.pin && st.pin === $content[0])) {
           st.kill();
         }
       });
 
-      const textWidth = $text[0].scrollWidth || $text.outerWidth();
-      const winWidth = window.innerWidth;
-
-      const startX = winWidth; 
-      const maxTravel = -(textWidth - winWidth + (winWidth * (isMobile ? 0.12 : 0.18)));
-      const endX = maxTravel < 0 ? maxTravel : -textWidth * 0.45;
-
+      const startX = isMobile ? 32 : 48;
+      const endX = isMobile ? -85 : -100;
       const useSTPin = isMobile || !hasSmoothLoco;
-      const pinDistance = isMobile ? winWidth * 1.8 : winWidth * 3;
+      const pinDistance = isMobile ? window.innerWidth * 1.8 : window.innerWidth * 3;
 
-      const tl = gsap.timeline({
+      const scrollTween = gsap.fromTo($text, {
+        xPercent: startX
+      }, {
+        xPercent: endX,
+        ease: 'none',
         scrollTrigger: {
           trigger: $container[0],
           pin: useSTPin ? $content[0] : false,
@@ -1964,35 +1972,68 @@ function initMWG11() {
           scroller: scrollerTarget,
           start: "top top",
           end: useSTPin ? "+=" + pinDistance : "bottom bottom",
-          scrub: 1,
+          scrub: 0.5,
           invalidateOnRefresh: true,
           anticipatePin: 1
         }
       });
 
-      tl.fromTo($text[0], {
-        x: startX
-      }, {
-        x: endX,
-        ease: "none",
-        duration: 1
-      }, 0);
+      // Individual character bouncy physics: smooth glide that straightens quickly
+      // Becomes 100% straight before reaching viewport center so it is always level and crisp!
+      if ($letters.length) {
+        $letters.each(function () {
+          gsap.from(this, {
+            yPercent: (Math.random() - 0.5) * (isMobile ? 50 : 120),
+            rotation: (Math.random() - 0.5) * (isMobile ? 18 : 28),
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: this,
+              scroller: scrollerTarget,
+              containerAnimation: scrollTween,
+              start: 'left 100%',
+              end: isMobile ? 'left 66%' : 'left 60%',
+              scrub: 0.35
+            }
+          });
+        });
+      }
 
-      const letters = $container.find('.letter');
-      if (letters.length) {
-        tl.from(letters, {
-          yPercent: () => gsap.utils.random(-200, 200),
-          xPercent: () => gsap.utils.random(-200, 200),
-          rotation: () => gsap.utils.random(-180, 180),
-          scale: () => gsap.utils.random(0.1, 2.5),
-          opacity: 0,
-          duration: 0.6,
-          stagger: {
-            amount: 0.5,
-            from: "start"
-          },
-          ease: "back.out(1.5)"
-        }, 0.1);
+      // Floating Stickers: glide & scale into place before center
+      if ($stickers.length) {
+        $stickers.each(function () {
+          gsap.from(this, {
+            scale: 0.5,
+            yPercent: (Math.random() - 0.5) * (isMobile ? 50 : 100),
+            rotation: (Math.random() - 0.5) * (isMobile ? 14 : 20),
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: this,
+              scroller: scrollerTarget,
+              containerAnimation: scrollTween,
+              start: 'left 100%',
+              end: isMobile ? 'left 66%' : 'left 55%',
+              scrub: 0.35
+            }
+          });
+        });
+      }
+
+      // Draw hand-drawn SVG arrows
+      if ($arrow.length && typeof DrawSVGPlugin !== 'undefined') {
+        $arrow.each(function () {
+          gsap.from(this, {
+            drawSVG: '0% 0%',
+            duration: 1,
+            scrollTrigger: {
+              trigger: this,
+              scroller: scrollerTarget,
+              containerAnimation: scrollTween,
+              start: 'left 95%',
+              end: 'left 40%',
+              scrub: 0.5
+            }
+          });
+        });
       }
     });
 
