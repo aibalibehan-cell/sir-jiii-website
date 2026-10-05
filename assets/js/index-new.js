@@ -1314,6 +1314,10 @@ function initPlayVideoInview() {
 * Scrolltrigger Animations Desktop + Mobile
 */
 function initScrolltriggerAnimations() {
+  const isMobile = window.innerWidth <= 767;
+  const scrollerEl = document.querySelector('[data-scroll-container]');
+  const hasSmoothLoco = scroll && scroll.options && scroll.options.smooth && !isMobile;
+  const scrollerTarget = hasSmoothLoco ? scrollerEl : window;
     
   if(document.querySelector(".footer-wrap")) {
   // Scrolltrigger Animation : Footer + hamburger
@@ -1324,6 +1328,7 @@ function initScrolltriggerAnimations() {
     let tl = gsap.timeline({
       scrollTrigger: {
         trigger: triggerElement,
+        scroller: scrollerTarget,
         start: "50% 100%",
         end: "100% 120%",
         scrub: 0
@@ -1345,7 +1350,8 @@ function initScrolltriggerAnimations() {
     let tl = gsap.timeline({
       scrollTrigger: {
         trigger: triggerElement,
-        toggleActions:'play none none reset', 
+        scroller: scrollerTarget,
+        toggleActions: 'play none none none', 
         start: "0% 100%",
         end: "100% 0%"
       }
@@ -1356,7 +1362,8 @@ function initScrolltriggerAnimations() {
         stagger: .01,
         ease: "power3.out",
         duration: 1,
-        delay: 0
+        delay: 0,
+        clearProps: "all"
       });
     }
   });
@@ -1371,7 +1378,8 @@ function initScrolltriggerAnimations() {
     let tl = gsap.timeline({
       scrollTrigger: {
         trigger: triggerElement,
-        toggleActions:'play none none reset',
+        scroller: scrollerTarget,
+        toggleActions: 'play none none none',
         start: "0% 110%",
         end: "100% 0%",
       }
@@ -1381,8 +1389,9 @@ function initScrolltriggerAnimations() {
         y: "2em",
         opacity: 0,
         ease: "expo.out",
-        duration: 1.75,
-        delay: 0
+        duration: 1.25,
+        delay: 0,
+        clearProps: "all"
       });
     }
   });
@@ -1397,6 +1406,7 @@ function initScrolltriggerAnimations() {
     let tl = gsap.timeline({
       scrollTrigger: {
         trigger: triggerElement,
+        scroller: scrollerTarget,
         start: "0% 100%",
         end: "100% 0%",
         scrub: 0
@@ -1409,9 +1419,6 @@ function initScrolltriggerAnimations() {
   });
   }
 
-  // Disable GSAP on Mobile
-  // Source: https://greensock.com/forums/topic/26325-disabling-scrolltrigger-on-mobile-with-mediamatch/
-  
   // PatnaHost Kinetic Doodle Vector Engine
   $('[data-scroll-animation="draw"]').each(function () {
     let triggerElement = $(this);
@@ -1419,9 +1426,10 @@ function initScrolltriggerAnimations() {
     let tl = gsap.timeline({
       scrollTrigger: {
         trigger: triggerElement,
-        start: "top 92%",
-        end: "bottom 8%",
-        toggleActions: "play reverse play reverse",
+        scroller: scrollerTarget,
+        start: "top 95%",
+        end: "bottom 5%",
+        toggleActions: "play none none none",
       }
     });
     if (typeof DrawSVGPlugin !== 'undefined') {
@@ -1443,15 +1451,16 @@ function initScrolltriggerAnimations() {
     let tl = gsap.timeline({
       scrollTrigger: {
         trigger: triggerElement,
-        start: "top 92%",
-        end: "bottom 8%",
-        toggleActions: "play reverse play reverse",
+        scroller: scrollerTarget,
+        start: "top 95%",
+        end: "bottom 5%",
+        toggleActions: "play none none none",
       }
     });
     tl.from(targetElement, {
-      xPercent: () => gsap.utils.random(-20, 20),
-      yPercent: () => gsap.utils.random(-20, 20),
-      rotation: () => gsap.utils.random(-25, 25),
+      xPercent: () => gsap.utils.random(-15, 15),
+      yPercent: () => gsap.utils.random(-15, 15),
+      rotation: () => gsap.utils.random(-20, 20),
       scale: 0,
       duration: 0.85,
       ease: "elastic.out(1, 0.75)",
@@ -1467,16 +1476,17 @@ function initScrolltriggerAnimations() {
     let tl = gsap.timeline({
       scrollTrigger: {
         trigger: triggerElement,
-        start: "top 92%",
-        end: "bottom 8%",
+        scroller: scrollerTarget,
+        start: "top 95%",
+        end: "bottom 5%",
         toggleActions: "play none none none"
       }
     });
     tl.from(targetElementSticker, {
       delay: 0.1,
-      xPercent: -25,
-      yPercent: 25,
-      rotate: -25,
+      xPercent: -20,
+      yPercent: 20,
+      rotate: -20,
       scale: 0,
       duration: 0.85,
       ease: "elastic.out(1, 0.75)",
@@ -1648,13 +1658,15 @@ function initScrolltriggerAnimations() {
           let tl = gsap.timeline({
             scrollTrigger: {
               trigger: triggerElement,
+              scroller: window,
               start: "0% 100%",
               end: "100% 100%",
-              scrub: 0
+              scrub: 0.3
             }
           });
           tl.to(targetElementRound, {
-            height: 0,
+            scaleY: 0,
+            transformOrigin: "bottom center",
             ease: "none"
           }, 0);
         });
@@ -1668,15 +1680,15 @@ function initScrolltriggerAnimations() {
         
           if (targetTile.length) {
             gsap.fromTo(targetTile[0], {
-              yPercent: 75
+              yPercent: 45
             }, {
               yPercent: 0,
               ease: "none",
               scrollTrigger: {
                 trigger: triggerElement[0],
                 scroller: window,
-                start: "top 90%",
-                end: "bottom 95%",
+                start: "top 85%",
+                end: "top 20%",
                 scrub: true
               }
             });
@@ -1685,12 +1697,12 @@ function initScrolltriggerAnimations() {
       }
 
       if(document.querySelector(".about-image .single-about-image .overlay")) {
-        // Mobile Parallax: About Image Nitish portrait (matches home hero smooth parallax, zero jitter)
-        gsap.to(".about-image .single-about-image .overlay", {
+        // Mobile Parallax: Matches home hero smooth parallax
+        gsap.to(".about-image .single-about-image .overlay:nth-child(1)", {
           yPercent: 14,
           ease: "none",
           scrollTrigger: {
-            trigger: ".about-image",
+            trigger: ".single-about-image",
             scroller: window,
             start: "top bottom",
             end: "bottom top",
@@ -1944,74 +1956,67 @@ function initMWG11() {
 
       // Kill previous ScrollTriggers for this container
       ScrollTrigger.getAll().forEach(st => {
-        if (st.trigger === $container[0] || (st.pin && st.pin === $container[0])) {
+        if (st.trigger === $container[0] || (st.pin && st.pin === $content[0]) || (st.pin && st.pin === $container[0])) {
           st.kill();
         }
       });
 
-      // Ensure text and letters never wrap
-      $text.css({ 'white-space': 'nowrap', 'width': 'max-content', 'display': 'inline-block' });
-      $letters.css({ 'white-space': 'nowrap', 'display': 'inline-block', 'will-change': 'transform' });
+      // Keep text completely straight, horizontal, no wrapping
+      $text.css({
+        'white-space': 'nowrap',
+        'width': 'max-content',
+        'display': 'inline-block',
+        'margin-left': '0px',
+        'margin-right': '0px',
+        'will-change': 'transform'
+      });
+      $letters.css({
+        'white-space': 'nowrap',
+        'display': 'inline-block',
+        'transform': 'none',
+        'vertical-align': 'baseline'
+      });
 
       const winWidth = window.innerWidth;
-      const textWidth = $text[0].scrollWidth || $text.outerWidth() || 2000;
-      const marginLeft = parseFloat($text.css('margin-left')) || (winWidth * (isMobile ? 0.04 : 0.1));
-      
-      // Calculate exact shift to place the start of text completely outside the right edge of the screen (blank screen first!):
-      const shiftX = Math.max(winWidth - marginLeft + 40, winWidth * 0.95);
-      const startXPercent = Math.max((shiftX / textWidth) * 100, isMobile ? 38 : 58);
-      const endXPercent = isMobile ? -85 : -95;
+      const textWidth = $text[0].scrollWidth || $text.outerWidth() || 2400;
+
+      // Start position: 100% off-screen to the right (frame is 100% clean and blank when entering)
+      const startX = winWidth + 60;
+      // End position: text slides smoothly until "businesses actually grow" settles in view
+      const endX = -(textWidth - winWidth * (isMobile ? 0.35 : 0.65));
 
       const scrollTween = gsap.fromTo($text, {
-        xPercent: startXPercent
+        x: startX
       }, {
-        xPercent: endXPercent,
+        x: endX,
         ease: 'none',
         scrollTrigger: {
           trigger: $container[0],
           scroller: scrollerTarget,
           start: "top top",
           end: "bottom bottom",
-          scrub: isMobile ? 0.4 : 0.6,
+          scrub: isMobile ? 0.35 : 0.5,
           invalidateOnRefresh: true
         }
       });
 
-      // Individual character bouncy physics: smooth glide that straightens quickly
-      // Becomes 100% straight before reaching viewport center so it is always level and crisp!
-      if ($letters.length) {
-        $letters.each(function () {
-          gsap.from(this, {
-            yPercent: (Math.random() - 0.5) * (isMobile ? 80 : 140),
-            rotation: (Math.random() - 0.5) * (isMobile ? 18 : 24),
-            ease: "sine.out",
-            scrollTrigger: {
-              trigger: this,
-              scroller: scrollerTarget,
-              containerAnimation: scrollTween,
-              start: 'left 105%',
-              end: isMobile ? 'left 70%' : 'left 55%',
-              scrub: 0.4
-            }
-          });
-        });
-      }
-
-      // Floating Stickers: glide & scale into place before center
+      // Floating Stickers: spring pop-in physics as they scroll into view
       if ($stickers.length) {
         $stickers.each(function () {
-          gsap.from(this, {
-            scale: 0.45,
-            yPercent: (Math.random() - 0.5) * 120,
-            rotation: (Math.random() - 0.5) * 20,
-            ease: "sine.out",
+          gsap.fromTo(this, {
+            scale: 0,
+            opacity: 0
+          }, {
+            scale: 1,
+            opacity: 1,
+            ease: "back.out(2)",
             scrollTrigger: {
               trigger: this,
               scroller: scrollerTarget,
               containerAnimation: scrollTween,
-              start: 'left 105%',
-              end: isMobile ? 'left 70%' : 'left 55%',
-              scrub: 0.4
+              start: 'left 92%',
+              end: 'left 50%',
+              scrub: 0.35
             }
           });
         });
@@ -2020,16 +2025,17 @@ function initMWG11() {
       // Draw hand-drawn SVG arrows
       if ($arrow.length && typeof DrawSVGPlugin !== 'undefined') {
         $arrow.each(function () {
-          gsap.from(this, {
-            drawSVG: '0% 0%',
-            duration: 1,
+          gsap.fromTo(this, {
+            drawSVG: '0% 0%'
+          }, {
+            drawSVG: '0% 100%',
             scrollTrigger: {
               trigger: this,
               scroller: scrollerTarget,
               containerAnimation: scrollTween,
-              start: 'left 95%',
-              end: 'left 30%',
-              scrub: 0.6
+              start: 'left 90%',
+              end: 'left 35%',
+              scrub: 0.4
             }
           });
         });
